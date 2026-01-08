@@ -27,6 +27,8 @@ export class TemplateValidatorComponent implements OnChanges {
     const marginRight = page.marginRight ?? page.margin ?? 0;
 
     for (const obj of objects) {
+      // Pomijaj ostrzeżenia dla blocków bez tekstu
+      if (obj.type === 'text' && !obj.text) continue;
       if (
         obj.x < marginLeft ||
         obj.y < marginTop ||

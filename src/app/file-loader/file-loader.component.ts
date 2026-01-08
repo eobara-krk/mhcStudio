@@ -36,17 +36,14 @@ export class FileLoaderComponent {
           // Wyciągnij rozmiar strony i marginesy
           const pageNode = xml.querySelector('fo\\:simple-page-master');
           let width = 210, height = 297;
-          // Domyślne marginesy: 1 cm góra, 2 cm lewa, 1 cm dół, 1 cm prawa
           let marginTop = 10, marginLeft = 20, marginBottom = 10, marginRight = 10;
           if (pageNode) {
             const w = pageNode.getAttribute('page-width');
             const h = pageNode.getAttribute('page-height');
             width = this.parseLength(w) || width;
             height = this.parseLength(h) || height;
-            // Marginesy z fo:region-body
             const regionBody = pageNode.querySelector('fo\\:region-body');
             if (regionBody) {
-              // margin, margin-top, margin-left, margin-bottom, margin-right
               const m = regionBody.getAttribute('margin');
               const mt = regionBody.getAttribute('margin-top');
               const ml = regionBody.getAttribute('margin-left');
@@ -65,25 +62,39 @@ export class FileLoaderComponent {
           const objects: any[] = [];
           let y = 20;
           let blockCount = 0, imgCount = 0, tableCount = 0;
-          function walk(node: Element) {
-            // Teksty
-            if (node.localName === 'block' && node.namespaceURI?.includes('XSL/Format')) {
+          const walk = (node: Element) => {
+            // Debug: loguj każdy element
+            console.log('EPR node:', node.localName, node.namespaceURI, node);
+
+            // Teksty: szukaj 'block' w dowolnym namespace
+            if (node.localName === 'block') {
               const text = node.textContent?.trim() || '';
               if (text.length > 0) {
+                // Pobierz atrybuty pozycji i rozmiaru (jeśli są)
+                const xAttr = node.getAttribute('x');
+                const yAttr = node.getAttribute('y');
+                const widthAttr = node.getAttribute('width');
+                const heightAttr = node.getAttribute('height');
+                // Przelicz na liczby, domyślnie fallback
+                const x = this.parseLength(xAttr) ?? 10;
+                const yVal = this.parseLength(yAttr) ?? y;
+                const width = this.parseLength(widthAttr) ?? 200;
+                const height = this.parseLength(heightAttr) ?? 30;
                 objects.push({
-                  id: text.length > 30 ? text.slice(0, 27) + '...' : text, // id to fragment treści
+                  id: text.length > 30 ? text.slice(0, 27) + '...' : text,
                   type: 'text',
-                  x: 10,
-                  y: y,
-                  width: 200,
-                  height: 30,
+                  x,
+                  y: yVal,
+                  width,
+                  height,
                   text
                 });
                 y += 40;
+                blockCount++;
               }
             }
-            // Obrazy
-            if (node.localName === 'external-graphic' && node.namespaceURI?.includes('XSL/Format')) {
+            // Obrazy: szukaj 'external-graphic' w dowolnym namespace
+            if (node.localName === 'external-graphic') {
               objects.push({
                 id: 'img' + (imgCount++),
                 type: 'image',
@@ -94,8 +105,8 @@ export class FileLoaderComponent {
                 src: node.getAttribute('src') || ''
               });
             }
-            // Tabele
-            if (node.localName === 'table' && node.namespaceURI?.includes('XSL/Format')) {
+            // Tabele: szukaj 'table' w dowolnym namespace
+            if (node.localName === 'table') {
               objects.push({
                 id: 'table' + (tableCount++),
                 type: 'table',
@@ -103,14 +114,15 @@ export class FileLoaderComponent {
                 y: y + tableCount * 80,
                 width: 300,
                 height: 60,
-                rows: node.querySelectorAll('fo\\:table-row').length,
-                cols: node.querySelectorAll('fo\\:table-column').length
+                rows: node.querySelectorAll('table-row').length,
+                cols: node.querySelectorAll('table-column').length
               });
             }
             // Rekurencja po dzieciach
             Array.from(node.children).forEach(walk);
           }
           walk(xml.documentElement);
+          console.log('EPR parsed objects:', objects);
           const template = {
             objects,
             page: { width, height, marginTop, marginLeft, marginBottom, marginRight }

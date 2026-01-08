@@ -6,6 +6,8 @@ import { TemplateValidatorComponent } from '../template-validator/template-valid
 import { TemplatePreviewComponent } from '../template-preview/template-preview.component';
 import { TemplateWarningsComponent } from '../template-warnings/template-warnings.component';
 
+import { PdfExportComponent } from '../pdf-export/pdf-export.component';
+
 @Component({
   selector: 'app-template-container',
   standalone: true,
@@ -14,6 +16,7 @@ import { TemplateWarningsComponent } from '../template-warnings/template-warning
     TemplateValidatorComponent,
     TemplatePreviewComponent,
     TemplateWarningsComponent
+    ,PdfExportComponent
   ],
   templateUrl: './template-container.component.html'
 })
@@ -23,6 +26,7 @@ export class TemplateContainerComponent {
   problematicIds: string[] = [];
 
   onFileLoaded(data: Template) {
+    console.log('Loaded template:', data);
     this.template = data;
   }
 
