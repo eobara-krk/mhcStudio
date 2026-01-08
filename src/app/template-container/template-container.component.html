@@ -1,0 +1,10 @@
+<app-file-loader (fileLoaded)="onFileLoaded($event)"></app-file-loader>
+<app-template-validator
+  [template]="template"
+  (validationResult)="onValidationResult($event)">
+</app-template-validator>
+<app-template-preview
+  [template]="template"
+  [problematicIds]="problematicIds">
+</app-template-preview>
+<app-template-warnings [warnings]="warnings"></app-template-warnings>

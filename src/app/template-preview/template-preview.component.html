@@ -1,0 +1,162 @@
+        <ng-container *ngIf="template as t">
+          <div style="display: flex; flex-direction: row; justify-content: flex-start; align-items: flex-start; gap: 32px; padding: 16px 0 0 16px; background: #f8f8f8;">
+            <div>
+              <div style="font-weight: bold; color: #bfa500; margin-bottom: 6px;">Okienko adresowe</div>
+              <div style="font-size: 13px;">Pozycja: <b>10,0 cm</b> od lewej, <b>3,12 cm</b> od góry</div>
+              <div style="font-size: 13px;">Rozmiar:</div>
+              <div style="font-size: 13px; margin-left: 12px;">szerokość: <b>10,72 cm</b></div>
+              <div style="font-size: 13px; margin-left: 12px;">wysokość: <b>6,12 cm</b></div>
+            </div>
+            <div>
+              <div style="font-weight: bold; color: #0077b6; margin-bottom: 6px;">Obszar logo KRUK</div>
+              <div style="font-size: 13px;">Pozycja: <b>17,44 cm</b> od lewej, <b>1,00 cm</b> od góry</div>
+              <div style="font-size: 13px;">Rozmiar:</div>
+              <div style="font-size: 13px; margin-left: 12px;">szerokość: <b>2,56 cm</b></div>
+              <div style="font-size: 13px; margin-left: 12px;">wysokość: <b>2,00 cm</b></div>
+            </div>
+            <div>
+              <div style="font-weight: bold; color: #d7263d; margin-bottom: 6px;">Obszar kodu kreskowego</div>
+              <div style="font-size: 13px;">Pozycja: <b>13,98 cm</b> od lewej, <b>4,64 cm</b> od góry</div>
+              <div style="font-size: 13px;">Rozmiar:</div>
+              <div style="font-size: 13px; margin-left: 12px;">szerokość: <b>6,01 cm</b></div>
+              <div style="font-size: 13px; margin-left: 12px;">wysokość: <b>0,76 cm</b></div>
+            </div>
+            <div>
+              <div style="font-weight: bold; color: #009e60; margin-bottom: 6px;">Obszar adresu klienta</div>
+              <div style="font-size: 13px;">Pozycja: <b>12,09 cm</b> od lewej, <b>6,08 cm</b> od góry</div>
+              <div style="font-size: 13px;">Rozmiar:</div>
+              <div style="font-size: 13px; margin-left: 12px;">szerokość: <b>7,29 cm</b></div>
+              <div style="font-size: 13px; margin-left: 12px;">wysokość: <b>2,50 cm</b></div>
+            </div>
+          </div>
+        </ng-container>
+<ng-container *ngIf="template as t">
+  <div style="display: flex; flex-direction: row; height: 100vh; background: #f8f8f8;">
+    <ng-container *ngIf="template as t">
+      <div style="width: 170px; padding: 24px 8px 8px 16px; font-size: 14px; color: #666; font-family: Arial, sans-serif; background: #f4f4f4; border-radius: 0 12px 12px 0; box-shadow: 1px 0 6px #eee; min-height: 100vh;">
+        <div style="margin-bottom: 18px;">
+          <div style="font-weight: bold; color: #444; margin-bottom: 6px;">Marginesy</div>
+          <div>góra: <b>{{t.page.marginTop}} mm</b></div>
+          <div>lewa: <b>{{t.page.marginLeft}} mm</b></div>
+          <div>dół: <b>{{t.page.marginBottom}} mm</b></div>
+          <div>prawa: <b>{{t.page.marginRight}} mm</b></div>
+        </div>
+        <div style="margin-bottom: 18px;">
+          <div style="font-weight: bold; color: #444; margin-bottom: 6px;">Rozmiar strony</div>
+          <div><b>{{t.page.width}} mm × {{t.page.height}} mm</b></div>
+        </div>
+      </div>
+    </ng-container>
+    <div style="flex: 1; overflow: auto;">
+    <svg
+      [attr.width]="mmToPx(t.page.width) + 30"
+      [attr.height]="mmToPx(t.page.height) + 30"
+      style="border:1px solid #ccc;display:block;margin:auto;background:white;">
+      <!-- Linijka górna: tylko główne podziałki i cyfry co 1 cm -->
+      <g>
+        <rect x="30" y="0" [attr.width]="mmToPx(t.page.width)" height="30" fill="#f0f0f0" />
+        <g *ngFor="let i of cmTicks(t.page.width)">
+          <line [attr.x1]="mmToPx(i * 10) + 30" y1="0" [attr.x2]="mmToPx(i * 10) + 30" y2="30" stroke="#888" stroke-width="2" />
+          <text *ngIf="i > 0" [attr.x]="mmToPx(i * 10) + 30" y="20" font-size="13" fill="#444" text-anchor="middle">{{i}}</text>
+        </g>
+      </g>
+      <!-- Linijka lewa: tylko główne podziałki i cyfry co 1 cm -->
+      <g>
+        <rect x="0" y="30" width="30" [attr.height]="mmToPx(t.page.height)" fill="#f0f0f0" />
+        <g *ngFor="let i of cmTicks(t.page.height)">
+          <line x1="0" [attr.y1]="mmToPx(i * 10) + 30" x2="30" [attr.y2]="mmToPx(i * 10) + 30" stroke="#888" stroke-width="2" />
+          <text *ngIf="i > 0" x="15" [attr.y]="mmToPx(i * 10) + 34" font-size="13" fill="#444" text-anchor="middle">{{i}}</text>
+        </g>
+      </g>
+      <!-- Przesuń całą stronę o 30px w prawo i w dół -->
+      <g transform="translate(30,30)">
+        <rect
+          [attr.x]="mmToPx(t.page.marginLeft ?? 0)"
+          [attr.y]="mmToPx(t.page.marginTop ?? 0)"
+          [attr.width]="mmToPx(t.page.width - (t.page.marginLeft ?? 0) - (t.page.marginRight ?? 0))"
+          [attr.height]="mmToPx(t.page.height - (t.page.marginTop ?? 0) - (t.page.marginBottom ?? 0))"
+          fill="none" stroke="blue" stroke-dasharray="4"/>
+        <!-- Specjalny obszar okienka adresowego: x=100mm (10cm), y=21.2mm (2.12cm), width=107.2mm (10.72cm), height=61.2mm (6.12cm) -->
+        <rect
+          [attr.x]="mmToPx(100)"
+          [attr.y]="mmToPx(31.2)"
+          [attr.width]="mmToPx(107.2)"
+          [attr.height]="mmToPx(61.2)"
+          fill="none" stroke="#bfa500" stroke-width="2" stroke-dasharray="6"/>
+        <text
+          [attr.x]="mmToPx(102)"
+          [attr.y]="mmToPx(31.2 + 8)"
+          font-size="16" fill="#bfa500" font-family="Arial, sans-serif">Okienko adresowe</text>
+        <!-- Obszar kodu kreskowego w okienku adresowym: x=139.8mm (13.98cm), y=46.4mm (4.64cm), width=60.1mm (6.01cm), height=7.6mm (0.76cm) -->
+        <rect
+          [attr.x]="mmToPx(139.8)"
+          [attr.y]="mmToPx(46.4)"
+          [attr.width]="mmToPx(60.1)"
+          [attr.height]="mmToPx(7.6)"
+          fill="none" stroke="#d7263d" stroke-width="2" stroke-dasharray="2"/>
+        <text
+          [attr.x]="mmToPx(140.5)"
+          [attr.y]="mmToPx(46.4 + 6)"
+          font-size="13" fill="#d7263d" font-family="Arial, sans-serif">Obszar na kod kreskowy</text>
+        <!-- Obszar logo KRUK: x=174.4mm (17.44cm), y=10mm (1cm), width=25.6mm (2.56cm), height=20mm (2cm) -->
+        <rect
+          [attr.x]="mmToPx(174.4)"
+          [attr.y]="mmToPx(10)"
+          [attr.width]="mmToPx(25.6)"
+          [attr.height]="mmToPx(20)"
+          fill="none" stroke="#0077b6" stroke-width="2" stroke-dasharray="4"/>
+        <text
+          [attr.x]="mmToPx(175.4)"
+          [attr.y]="mmToPx(10 + 14)"
+          font-size="14" fill="#0077b6" font-family="Arial, sans-serif">Logo KRUK</text>
+        <!-- Obszar adresu klienta: x=120.9mm (12.09cm), y=50.8mm (5.08cm), width=72.9mm (7.29cm), height=14.4mm (1.44cm) -->
+        <rect
+          [attr.x]="mmToPx(120.9)"
+          [attr.y]="mmToPx(60.8)"
+          [attr.width]="mmToPx(72.9)"
+          [attr.height]="mmToPx(25)"
+          fill="none" stroke="#009e60" stroke-width="2" stroke-dasharray="3"/>
+        <text
+          [attr.x]="mmToPx(121.5)"
+          [attr.y]="mmToPx(60.8 + 16)"
+          font-size="13" fill="#009e60" font-family="Arial, sans-serif">Adres klienta</text>
+        <ng-container *ngFor="let obj of t.objects">
+          <!-- Tekst -->
+          <g *ngIf="obj.type === 'text'">
+            <rect
+              [attr.x]="mmToPx(obj.x)"
+              [attr.y]="mmToPx(obj.y)"
+              [attr.width]="mmToPx(obj.width)"
+              [attr.height]="mmToPx(obj.height)"
+              [attr.fill]="problematicIds.includes(obj.id) ? 'red' : 'green'"
+              fill-opacity="0.3"
+              stroke="black"/>
+            <text [attr.x]="mmToPx(obj.x + 1)" [attr.y]="mmToPx(obj.y + 5)" font-size="10pt" font-family="Times New Roman, Times, serif" fill="black">{{obj.text}}</text>
+          </g>
+          <!-- Obrazek -->
+          <g *ngIf="obj.type === 'image'">
+            <rect
+              [attr.x]="mmToPx(obj.x)"
+              [attr.y]="mmToPx(obj.y)"
+              [attr.width]="mmToPx(obj.width)"
+              [attr.height]="mmToPx(obj.height)"
+              fill="#e0e0e0" stroke="black"/>
+            <image *ngIf="obj.src" [attr.x]="mmToPx(obj.x)" [attr.y]="mmToPx(obj.y)" [attr.width]="mmToPx(obj.width)" [attr.height]="mmToPx(obj.height)" [attr.href]="obj.src" />
+            <text [attr.x]="mmToPx(obj.x + 1)" [attr.y]="mmToPx(obj.y + 4)" font-size="10" fill="gray">obrazek</text>
+          </g>
+          <!-- Tabela -->
+          <g *ngIf="obj.type === 'table'">
+            <rect
+              [attr.x]="mmToPx(obj.x)"
+              [attr.y]="mmToPx(obj.y)"
+              [attr.width]="mmToPx(obj.width)"
+              [attr.height]="mmToPx(obj.height)"
+              fill="#fffbe6" stroke="black"/>
+            <text [attr.x]="mmToPx(obj.x + 1)" [attr.y]="mmToPx(obj.y + 5)" font-size="12" fill="#bfa500">Tabela: {{obj.rows}}x{{obj.cols}}</text>
+          </g>
+        </ng-container>
+      </g>
+    </svg>
+    </div>
+  </div>
+</ng-container>
